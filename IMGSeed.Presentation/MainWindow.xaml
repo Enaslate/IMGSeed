@@ -1,0 +1,89 @@
+﻿<Window x:Class="IMGSeed.Presentation.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:IMGSeed.Presentation"
+        mc:Ignorable="d"
+        Title="MainWindow" 
+        MinWidth="1360" MinHeight="768"
+        Height="auto" Width="auto"
+        Background="Gray">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="111*"></ColumnDefinition>
+            <ColumnDefinition Width="161*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <DockPanel x:Name="menu" Background="#32343E">
+            <StackPanel  VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Image x:Name="originalImage" Source="src/images/art.jpg" Height="500" Width="552" Margin="10"/>
+                <Button x:Name="selectImage" Click="selectImage_Click" Content="Выбрать изображение" Height="20" Width="128" Margin="0,3,0,0"/>
+                <WrapPanel HorizontalAlignment="Center" >
+                    <TextBlock TextWrapping="Wrap" Text="Цвет фона" VerticalAlignment="Center" Margin="0,3,10,0" Foreground="White"/>
+                    <ComboBox x:Name="backgroundColors" SelectionChanged="backgroundColors_SelectionChanged" Margin="0,3,0,0" >
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Width="20" Height="20" Margin="5" Fill="{Binding}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </WrapPanel>
+                <WrapPanel HorizontalAlignment="Center">
+                    <TextBlock TextWrapping="Wrap" Text="Цвет текста" Margin="0,3,10,0" Foreground="White"/>
+                    <ComboBox x:Name="textColors" SelectionChanged="textColors_SelectionChanged" Margin="0,3,0,0" >
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle x:Name="selectedTextColor" Width="20" Height="20" Margin="5" Fill="{Binding}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </WrapPanel>
+                <WrapPanel HorizontalAlignment="Center">
+                    <TextBlock TextWrapping="Wrap" Text="Масштаб" Margin="0,3,10,0" Foreground="White"/>
+                    <TextBox x:Name="scaleValue" Text="" TextChanged="scaleValue_TextChanged" Margin="0,3,0,0"/>
+                </WrapPanel>
+                <WrapPanel HorizontalAlignment="Center">
+                    <TextBlock TextWrapping="Wrap" Text="Размер" Margin="0,3,10,0" Foreground="White"/>
+                    <WrapPanel>
+                        <TextBox x:Name="sizeValue" Text="" TextChanged="sizeValue_TextChanged" Margin="0,3,0,0"/>
+                    </WrapPanel>
+                </WrapPanel>
+                <Button x:Name="generateTextImage" Content="Применить" Height="20" Width="128" Click="generateTextImage_Click" Margin="0,3,0,0"/>
+            </StackPanel>
+        </DockPanel>
+
+        <DockPanel 
+            Grid.Column="1" Grid.Row="0"
+            Background="Black">
+            <ScrollViewer x:Name="txtImgWrapper" 
+                          HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                          Background="Black"
+                          Grid.Column="1" Grid.Row="0">
+                <Viewbox Stretch="Fill">
+                    <TextBox
+                                x:Name="txtImg"
+                                BorderBrush="Black"
+                                TextWrapping="NoWrap" 
+                                FontFamily="Consolas"
+                                HorizontalScrollBarVisibility="Disabled" 
+                                VerticalScrollBarVisibility="Disabled" 
+                                IsReadOnly="True"
+                                FontSize="1"
+                                HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Background="White" Foreground="Black">
+
+                    </TextBox>
+                </Viewbox>
+            </ScrollViewer>
+        </DockPanel>
+    </Grid>
+
+</Window>
