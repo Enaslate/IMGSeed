@@ -1,5 +1,4 @@
-﻿using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
@@ -42,25 +41,6 @@ namespace IMGSeed.Presentation
 
             scaleValue.Text = _scale.ToString();
             sizeValue.Text = _size.ToString();
-
-            txtImgWrapper.Height = 0;
-            txtImgWrapper.Width = 0;
-        }
-
-        private void Write(string str, int height, int width)
-        {
-            txtImg.Text = str;
-            txtImgWrapper.Width = width * _size;
-            txtImgWrapper.Height = height * _size;
-
-            if (txtImgWrapper.Width > 1920)
-            {
-                txtImgWrapper.Width = 1920;
-            }
-            if (txtImgWrapper.Height > 1080)
-            {
-                txtImgWrapper.Height = 1080;
-            }
         }
 
         private void selectImage_Click(object sender, RoutedEventArgs e)
@@ -91,7 +71,6 @@ namespace IMGSeed.Presentation
             if (!string.IsNullOrEmpty(_imagePath))
             {
                 _viewModel.GenerateArt(_imagePath);
-                Write(_viewModel.Art, _artwork.Height, _artwork.Width);
             }
         }
 
@@ -111,7 +90,7 @@ namespace IMGSeed.Presentation
             if (ValidateTextBox(scaleValue.Text, scaleValue))
             {
                 _scale = int.Parse(scaleValue.Text);
-                _viewModel.Scale = _scale;
+                _viewModel.SetScale(_scale);
             }
             
         }
@@ -121,6 +100,7 @@ namespace IMGSeed.Presentation
             if (ValidateTextBox(sizeValue.Text, sizeValue))
             {
                 _size = int.Parse(sizeValue.Text);
+                _viewModel.SetSize(_size);
             }
         }
 
