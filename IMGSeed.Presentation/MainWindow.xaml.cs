@@ -1,20 +1,20 @@
 ﻿using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.IO;
-using System.Windows.Resources;
 using System.Windows.Media;
+using IMGSeed.Presentation.ViewModels;
+using IMGSeed.Presentation.Domain.Models;
+using IMGSeed.Application.Services;
+using IMGSeed.Domain.Models;
 
 namespace IMGSeed.Presentation
 {
     public partial class MainWindow : Window
     {
+        private ArtworkViewModel _viewModel;
+        private Artwork _artwork;
+
         private string? _imagePath;
         private Brush _backgroundColor;
         private Brush _textColor;
@@ -24,6 +24,14 @@ namespace IMGSeed.Presentation
         public MainWindow()
         {
             InitializeComponent();
+
+            _artwork = new Artwork();
+            CharacterMap characterMap = new CharacterMap();
+            ArtworkDrawerService drawerService = new ArtworkDrawerService(characterMap);
+
+            _viewModel = new ArtworkViewModel(_artwork, drawerService, _scale);
+            DataContext = _viewModel;
+
             AvaibalableColors();
 
             backgroundColors.SelectedIndex = 0;
@@ -37,98 +45,6 @@ namespace IMGSeed.Presentation
 
             txtImgWrapper.Height = 0;
             txtImgWrapper.Width = 0;
-        }
-
-        private void Generate(BitmapImage bitmapImage)
-        {
-            txtImg.Background = _backgroundColor;
-            txtImg.Foreground = _textColor;
-
-            StringBuilder str = new StringBuilder();
-
-            if (bitmapImage != null)
-            {
-                int width = bitmapImage.PixelWidth;
-                int height = bitmapImage.PixelHeight;
-
-                int stride = width * ((bitmapImage.Format.BitsPerPixel + 7) / 8);
-                byte[] pixelData = new byte[height * stride];
-
-                bitmapImage.CopyPixels(pixelData, stride, 0);
-
-                for (int y = 0; y < height; y+=_scale)
-                {
-                    if (y != 0 || y != height)
-                    {
-                        str.Append('\n');
-                    }
-
-                    for (int x = 0; x < width; x+=_scale)
-                    {
-                        int index = y * stride + x * ((bitmapImage.Format.BitsPerPixel + 7) / 8);
-
-                        byte blue = pixelData[index];
-                        byte green = pixelData[index + 1];
-                        byte red = pixelData[index + 2];
-
-                        double brightness = GetPixelBrightness(red, green, blue);
-
-                        if (brightness >= 0 && brightness < 0.1)
-                        {
-                            str.Append('@');
-                        }
-                        else if (brightness >= 0.1 && brightness < 0.2)
-                        {
-                            str.Append("8");
-                        }
-                        else if(brightness >= 0.2 && brightness < 0.3)
-                        {
-                            str.Append("O");
-                        }
-                        else if(brightness >= 0.3 && brightness < 0.4)
-                        {
-                            str.Append("*");
-                        }
-                        else if(brightness >= 0.4 && brightness < 0.5)
-                        {
-                            str.Append("!");
-                        }
-                        else if(brightness >= 0.5 && brightness < 0.6)
-                        {
-                            str.Append("=");
-                        }
-                        else if(brightness >= 0.6 && brightness < 0.7)
-                        {
-                            str.Append(">");
-                        }
-                        else if(brightness >= 0.7 && brightness < 0.8)
-                        {
-                            str.Append("}");
-                        }
-                        else if(brightness >= 0.8 && brightness < 0.9)
-                        {
-                            str.Append("~");
-                        }
-                        else if(brightness >= 0.9 && brightness < 0.95)
-                        {
-                            str.Append(";");
-                        }
-                        else if(brightness > 0.95 && brightness <= 1)
-                        {
-                            str.Append(".");
-                        }
-                    }
-                }
-
-                Write(str.ToString(), height, width);
-            }
-            
-        }
-
-        private double GetPixelBrightness(byte red, byte green, byte blue)
-        {
-            double brightness = (0.2126 * red + 0.7152 * green + 0.0722 * blue) / 255.0;
-            return brightness;
         }
 
         private void Write(string str, int height, int width)
@@ -174,13 +90,8 @@ namespace IMGSeed.Presentation
         {
             if (!string.IsNullOrEmpty(_imagePath))
             {
-                BitmapImage bitmapImage = new BitmapImage();
-
-                bitmapImage.BeginInit();
-                bitmapImage.UriSource = new Uri(_imagePath);
-                bitmapImage.EndInit();
-
-                Generate(bitmapImage);
+                _viewModel.GenerateArt(_imagePath);
+                Write(_viewModel.Art, _artwork.Height, _artwork.Width);
             }
         }
 
@@ -200,6 +111,7 @@ namespace IMGSeed.Presentation
             if (ValidateTextBox(scaleValue.Text, scaleValue))
             {
                 _scale = int.Parse(scaleValue.Text);
+                _viewModel.Scale = _scale;
             }
             
         }
@@ -215,11 +127,13 @@ namespace IMGSeed.Presentation
         private void backgroundColors_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _backgroundColor = (Brush)backgroundColors.SelectedItem;
+            txtImg.Background = _backgroundColor;
         }
 
         private void textColors_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _textColor = (Brush)textColors.SelectedItem;
+            txtImg.Foreground = _textColor;
         }
 
         private bool ValidateTextBox(string str, TextBox textBox)
