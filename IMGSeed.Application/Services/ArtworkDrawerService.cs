@@ -45,8 +45,26 @@ namespace IMGSeed.Application.Services
                         int index = y * stride + x * bitsPerPixelRounded;
 
                         byte blue = pixelData[index];
-                        byte green = pixelData[index + 1];
-                        byte red = pixelData[index + 2];
+                        byte green;
+                        byte red;
+
+                        if (index + 1 < pixelData.Length)
+                        {
+                            green = pixelData[index + 1];
+                        }
+                        else
+                        {
+                            green = pixelData[index];
+                        }
+
+                        if (index + 2 < pixelData.Length)
+                        {
+                            red = pixelData[index + 2];
+                        }
+                        else
+                        {
+                            red = pixelData[index];
+                        }
 
                         double brightness = GetPixelBrightness(red, green, blue);
 
